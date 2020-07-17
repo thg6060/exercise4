@@ -139,12 +139,13 @@ func main() {
 	*/
 	//guid := xid.New()
 	u := Model.User{
-		Id:         "bs87var12b2tksrnsidg",
-		Birth:      BirthtoTimeStamp(7, 2, 1999),
-	
 	}
+	data,err := u.ShowList()
 	//err := u.TransactionBirth("bs87var12b2tksrnsidg", time.Now().UnixNano())
-	InsertwithPoint(&u)
+	for _,item :=range data{
+		fmt.Println(item)
+	}
+	
 	if err != nil {
 		fmt.Println(err)
 	}

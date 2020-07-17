@@ -51,14 +51,12 @@ func (u *User) ShowList() ([]*User,error){
 
 func (u *User) UserbyID(id string) (*User, error) {
 	result := User{}
-	temp := &result
-
-	eff, err := db.Table(temp).Where("id = ?", id).Get(temp)
+	eff, err := db.Where("id = ?", id).Get(&result)
 	if eff == false{
 		log.Println("cannot find user by id")
 		return nil,err
 	}
-	return temp, nil
+	return &result, nil
 
 }
 
