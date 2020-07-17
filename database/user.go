@@ -2,7 +2,6 @@ package Model
 
 import (
 	"errors"
-	"log"
 )
 
 type User struct {
@@ -59,8 +58,7 @@ func (u *User) UserbyID(id string) (*User, error) {
 	eff, err := db.Where("id = ?", id).Get(&result)
 
 	if eff == false {
-		log.Println("cannot find user by id")
-		return nil, errors.New("not found")
+		return nil, errors.New("not found user by id ")
 	}
 	if err != nil {
 		return nil, err
@@ -85,7 +83,7 @@ func (u *User) TransactionBirth(id string, birth int64) error {
 	eff1, err := session.Cols("points").Where("user_id = ?", id).Get(&p)
 	if !eff1 {
 		session.Rollback()
-		return errors.New("Get Point with Point field faild")	
+		return errors.New("Get Point with Point field failed")	
 	}
 	if err !=nil{
 		session.Rollback()
