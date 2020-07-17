@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"./database"
+	Model "./database"
 	//"github.com/rs/xid"
 )
 
@@ -40,8 +40,8 @@ loop:
 
 func InsertwithPoint(urs *Model.User) error {
 	//1.3/ Viết hàm: sau khi tạo user thì insert user_id vào user_point với số điểm 10.
-	p:=Model.Point{}
-	err := p.Insert(urs.Id,10)
+	p := Model.Point{}
+	err := p.Insert(urs.Id, 10)
 	if err != nil {
 		return err
 	}
@@ -138,18 +138,12 @@ func main() {
 		fmt.Println("done !")
 	*/
 	//guid := xid.New()
-	u := Model.User{
-	}
-	data,err := u.ShowList()
-	//err := u.TransactionBirth("bs87var12b2tksrnsidg", time.Now().UnixNano())
-	for _,item :=range data{
-		fmt.Println(item)
-	}
-	
+	u := Model.User{}
+	//data,err := u.ShowList()
+	err := u.TransactionBirth("bs87var12b2tksrnsidg", time.Now().UnixNano())
+
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	
 
 }

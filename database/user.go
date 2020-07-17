@@ -1,6 +1,7 @@
 package Model
 
 import (
+	"errors"
 	"log"
 )
 
@@ -14,13 +15,14 @@ type User struct {
 
 //connect db
 
-
 //1.1/ Viết hàm: Chỉ tạo db, và tạo model(struct) ánh xạ struct thành table (CreateTable, Sync2)
 //1.2/ Viết hàm: insert và update user, viết hàm list user hoặc đọc user theo id(4 hàm)
 func (u *User) Insert(urs *User) error {
 
-	_, err = db.Insert(urs)
-
+	eff, err := db.Insert(urs)
+	if eff == 0 {
+		return errors.New("Insert failed")
+	}
 	if err != nil {
 		return err
 	}
@@ -28,9 +30,12 @@ func (u *User) Insert(urs *User) error {
 
 }
 
-func (u *User) Update(urs *User,condition *User) error {
+func (u *User) Update(urs *User, condition *User) error {
 
-	_, err = db.Update(urs,condition)
+	eff, err := db.Update(urs, condition)
+	if eff == 0 {
+		return errors.New("Update failed")
+	}
 
 	if err != nil {
 		return err
@@ -38,28 +43,32 @@ func (u *User) Update(urs *User,condition *User) error {
 	return nil
 }
 
-func (u *User) ShowList() ([]*User,error){
+func (u *User) ShowList() ([]*User, error) {
 	var users []*User
 	err := db.Find(&users)
 
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	return users,nil
+	return users, nil
 
 }
 
 func (u *User) UserbyID(id string) (*User, error) {
 	result := User{}
 	eff, err := db.Where("id = ?", id).Get(&result)
-	if eff == false{
+
+	if eff == false {
 		log.Println("cannot find user by id")
-		return nil,err
+		return nil, errors.New("not found")
 	}
+	if err != nil {
+		return nil, err
+	}
+
 	return &result, nil
 
 }
-
 
 func (u *User) TransactionBirth(id string, birth int64) error {
 	/*
@@ -72,32 +81,49 @@ func (u *User) TransactionBirth(id string, birth int64) error {
 	defer session.Close()
 	p := Point{}
 	us := User{}
-
-	
+//
 	eff1, err := session.Cols("points").Where("user_id = ?", id).Get(&p)
-	if eff1 == false {
-		log.Println("Get Point with Point field faild")
+	if !eff1 {
+		session.Rollback()
+		return errors.New("Get Point with Point field faild")	
+	}
+	if err !=nil{
 		session.Rollback()
 		return err
 	}
-
+//
 	eff2, err := session.Cols("Name").Where("id = ?", id).Get(&us)
-	if eff2 == false {
-		log.Println("Get User with Name field failed")
+	if !eff2 {
+		session.Rollback()
+		return errors.New("Get User with Name field failed")
+		
+	}
+	if err !=nil{
 		session.Rollback()
 		return err
 	}
 
+//
 	eff3, err := session.Where("id = ?", id).Update(&User{Birth: birth, Name: u.Name + " Update"})
 	if eff3 == 0 {
-		log.Println("Update birth user failed")
+		session.Rollback()
+		return errors.New("Get User with Name field failed")
+		
+	}
+	if err!=nil{
 		session.Rollback()
 		return err
 	}
+
+	//
 
 	eff4, err := session.Cols("points").Where("user_id = ?", id).Update(&Point{Points: p.Points + 10})
 	if eff4 == 0 {
-		log.Println("Update point(+10) failed")
+		session.Rollback()
+		return errors.New("Get User with Name field failed")
+		
+	}
+	if err!=nil{
 		session.Rollback()
 		return err
 	}
