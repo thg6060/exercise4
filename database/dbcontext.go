@@ -12,3 +12,17 @@ func DbConn() (*xorm.Engine, error) {
 	}
 	return engine, nil
 }
+
+func (p *Point) CreateTablePoint(i interface{}) error{
+	
+	defer db.Close()
+	err = db.CreateTables(i)
+	err  = db.Sync2(i)
+
+	if err!=nil{
+		return err
+	}
+	
+	return nil
+}
+

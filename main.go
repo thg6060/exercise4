@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"./Model"
+	"./database"
 	//"github.com/rs/xid"
 )
 
@@ -129,7 +129,11 @@ func main() {
 		Created:    time.Now().UnixNano(),
 		Updated_at: time.Now().UnixNano(),
 	}
-	err := u.TransactionBirth("bs87vadsar12b2t34ksrnsidg", time.Now().UnixNano())
-	fmt.Println(err)
+	err := u.TransactionBirth("bs87var12b2tksrnsidg", time.Now().UnixNano())
+	//data, err := u.UserbyID("bs87var12b2tksr3213nsidg")
+	if err != nil {
+		fmt.Println(err)
+	}
+	
 
 }
