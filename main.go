@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	//"strconv"
 	"sync"
@@ -40,8 +41,11 @@ loop:
 
 func InsertwithPoint(urs *Model.User) error {
 	//1.3/ Viết hàm: sau khi tạo user thì insert user_id vào user_point với số điểm 10.
-	p := Model.Point{}
-	err := p.Insert(urs.Id, 10)
+	p := Model.Point{
+		User_id: urs.Id,
+		Points : 10,
+	}
+	err := p.Insert(&p)
 	if err != nil {
 		return err
 	}
@@ -80,6 +84,73 @@ func ReadFromDb(c chan DataUser, wg *sync.WaitGroup) error {
 		return err
 	}
 	return nil
+}
+
+func TransactionBirth(id string, birth int64) error {
+	/*
+		- b2: tạo 1 transaction khi update `birth` thành công thì cộng 10 điểm vào `point`
+		 sau đó sửa lại `name ` thành `$name + "updated "`
+		nếu 1 quá trình fail thì rollback, xong commit (CreateSesson)
+	*/
+
+	session := conn.NewSession()
+	defer session.Close()
+	p := Model.Point{}
+	us := Model.User{}
+	//
+	eff1, err := session.Cols("points").Where("user_id = ?", id).Get(&p)
+	if !eff1 {
+		session.Rollback()
+		return errors.New("Get Point with Point field failed")
+	}
+	if err != nil {
+		session.Rollback()
+		return err
+	}
+	//
+	eff2, err := session.Cols("Name").Where("id = ?", id).Get(&us)
+	if !eff2 {
+		session.Rollback()
+		return errors.New("Get User with Name field failed")
+
+	}
+	if err != nil {
+		session.Rollback()
+		return err
+	}
+
+	//
+	eff3, err := session.Where("id = ?", id).Update(&Model.User{Birth: birth, Name: us.Name + " Update"})
+	if eff3 == 0 {
+		session.Rollback()
+		return errors.New("Get User with Name field failed")
+
+	}
+	if err != nil {
+		session.Rollback()
+		return err
+	}
+
+	//
+
+	eff4, err := session.Cols("points").Where("user_id = ?", id).Update(&Model.Point{Points: p.Points + 10})
+	if eff4 == 0 {
+		session.Rollback()
+		return errors.New("Get User with Name field failed")
+
+	}
+	if err != nil {
+		session.Rollback()
+		return err
+	}
+
+	err = session.Commit()
+	if err != nil {
+		session.Rollback()
+		return err
+	}
+	return nil
+
 }
 
 func main() {
@@ -138,9 +209,16 @@ func main() {
 		fmt.Println("done !")
 	*/
 	//guid := xid.New()
-	u := Model.User{}
+	//u := Model.User{}
 	//data,err := u.ShowList()
-	err := u.TransactionBirth("bs87var12b2tksrnsidg", time.Now().UnixNano())
+	u := Model.User{
+		Id:         "CucCang",
+		Name:       "Giang " ,
+		Birth:      BirthtoTimeStamp(7, 2, 1999),
+		Created:    time.Now().UnixNano(),
+		Updated_at: time.Now().UnixNano(),
+	}
+	InsertwithPoint(&u)
 
 	if err != nil {
 		fmt.Println(err)

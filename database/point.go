@@ -1,6 +1,6 @@
 package Model
 
-import "fmt"
+import "errors"
 
 type Point struct {
 	User_id    string
@@ -8,14 +8,10 @@ type Point struct {
 	Max_points int64
 }
 
-func (p *Point) Insert(id string, pt int64) error {
-	pnt := Point{
-		Points:  pt,
-		User_id: id,
-	}
+func (p *Point) Insert(pnt *Point) error {
 	eff, err := db.Insert(pnt)
 	if eff == 0 {
-		fmt.Println("update point failed")
+		return errors.New("Insert point failed")
 	}
 	if err != nil {
 		return err
