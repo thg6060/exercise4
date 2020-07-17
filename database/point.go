@@ -5,7 +5,7 @@ import "errors"
 type Point struct {
 	UserId    string `json:"user_id"`
 	Points     int64 `json:"points"`
-	Max_points int64 `json:"max_points"`
+	MaxPoints int64 `json:"max_points"`
 }
 
 func (p *Point) Insert(pnt *Point) error {
