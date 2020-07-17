@@ -38,6 +38,22 @@ loop:
 	}
 }
 
+func InsertwithPoint(urs *Model.User) error {
+	//1.3/ Viết hàm: sau khi tạo user thì insert user_id vào user_point với số điểm 10.
+	p:=Model.Point{}
+	err := p.Insert(urs.Id,10)
+	if err != nil {
+		return err
+	}
+	_, err = conn.Insert(urs)
+
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
 func BirthtoTimeStamp(d int, m time.Month, y int) int64 {
 	t := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
 	result := t.UnixNano()
@@ -124,16 +140,15 @@ func main() {
 	//guid := xid.New()
 	u := Model.User{
 		Id:         "bs87var12b2tksrnsidg",
-		Name:       "Giang xyz",
 		Birth:      BirthtoTimeStamp(7, 2, 1999),
-		Created:    time.Now().UnixNano(),
-		Updated_at: time.Now().UnixNano(),
+	
 	}
-	err := u.TransactionBirth("bs87var12b2tksrnsidg", time.Now().UnixNano())
-	//data, err := u.UserbyID("bs87var12b2tksr3213nsidg")
+	//err := u.TransactionBirth("bs87var12b2tksrnsidg", time.Now().UnixNano())
+	InsertwithPoint(&u)
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	
 
 }

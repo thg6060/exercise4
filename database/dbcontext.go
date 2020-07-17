@@ -5,6 +5,8 @@ import (
 	"github.com/go-xorm/xorm"
 )
 
+var db, err = DbConn()
+
 func DbConn() (*xorm.Engine, error) {
 	engine, err := xorm.NewEngine("mysql", "root:root@/exercise4")
 	if err != nil {
@@ -13,16 +15,15 @@ func DbConn() (*xorm.Engine, error) {
 	return engine, nil
 }
 
-func (p *Point) CreateTablePoint(i interface{}) error{
-	
-	defer db.Close()
-	err = db.CreateTables(i)
-	err  = db.Sync2(i)
+func CreateTable() error {
 
-	if err!=nil{
+	defer db.Close()
+	err = db.CreateTables(&User{})
+	err = db.Sync2(&Point{})
+
+	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
-

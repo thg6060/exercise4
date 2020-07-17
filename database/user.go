@@ -13,7 +13,7 @@ type User struct {
 }
 
 //connect db
-var db, err = DbConn()
+
 
 //1.1/ Viết hàm: Chỉ tạo db, và tạo model(struct) ánh xạ struct thành table (CreateTable, Sync2)
 //1.2/ Viết hàm: insert và update user, viết hàm list user hoặc đọc user theo id(4 hàm)
@@ -28,9 +28,9 @@ func (u *User) Insert(urs *User) error {
 
 }
 
-func (u *User) Update(urs *User) error {
+func (u *User) Update(urs *User,condition *User) error {
 
-	_, err = db.Table(urs).Where("id = ?", urs.Id).Update(urs)
+	_, err = db.Update(urs,condition)
 
 	if err != nil {
 		return err
@@ -38,8 +38,8 @@ func (u *User) Update(urs *User) error {
 	return nil
 }
 
-func (u *User) ShowList() ([]User,error){
-	var users []User
+func (u *User) ShowList() ([]*User,error){
+	var users []*User
 	err := db.Find(&users)
 
 	if err != nil {
@@ -62,20 +62,6 @@ func (u *User) UserbyID(id string) (*User, error) {
 
 }
 
-func (u *User) InsertwithPnt(urs *User) error {
-	//1.3/ Viết hàm: sau khi tạo user thì insert user_id vào user_point với số điểm 10.
-	pnt := Point{
-		Points:  10,
-		User_id: urs.Id,
-	}
-	_, err = db.Insert(u, pnt)
-
-	if err != nil {
-		return err
-	}
-	return nil
-
-}
 
 func (u *User) TransactionBirth(id string, birth int64) error {
 	/*
