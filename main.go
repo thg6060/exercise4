@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+
 	//"strconv"
 	"sync"
 	"time"
@@ -42,8 +43,8 @@ loop:
 func InsertwithPoint(urs *Model.User) error {
 	//1.3/ Viết hàm: sau khi tạo user thì insert user_id vào user_point với số điểm 10.
 	p := Model.Point{
-		User_id: urs.Id,
-		Points : 10,
+		UserId: urs.Id,
+		Points:  10,
 	}
 	err := p.Insert(&p)
 	if err != nil {
@@ -213,10 +214,10 @@ func main() {
 	//data,err := u.ShowList()
 	u := Model.User{
 		Id:         "CucCang",
-		Name:       "Giang " ,
+		Name:       "Giang ",
 		Birth:      BirthtoTimeStamp(7, 2, 1999),
 		Created:    time.Now().UnixNano(),
-		Updated_at: time.Now().UnixNano(),
+		UpdatedAt: time.Now().UnixNano(),
 	}
 	InsertwithPoint(&u)
 

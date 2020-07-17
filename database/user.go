@@ -5,11 +5,11 @@ import (
 )
 
 type User struct {
-	Id         string
-	Name       string
-	Birth      int64
-	Created    int64
-	Updated_at int64
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	Birth      int64 `json:"birth"`
+	Created    int64 `json:"created"`
+	UpdatedAt int64 `json:"updated_at"`
 }
 
 //connect db

@@ -3,9 +3,9 @@ package Model
 import "errors"
 
 type Point struct {
-	User_id    string
-	Points     int64
-	Max_points int64
+	UserId    string `json:"user_id"`
+	Points     int64 `json:"points"`
+	Max_points int64 `json:"max_points"`
 }
 
 func (p *Point) Insert(pnt *Point) error {
