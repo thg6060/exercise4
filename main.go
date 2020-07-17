@@ -8,16 +8,16 @@ import (
 	"sync"
 	"time"
 
-	Model "./database"
+	"github.com/thg6060/exercise4/Database"
 	//"github.com/rs/xid"
 )
 
 type DataUser struct {
-	User Model.User
+	User Database.User
 	Id   int
 }
 
-var conn, err = Model.DbConn()
+var conn, err = Database.DbConn()
 
 func worker(done []chan bool, c chan DataUser, wg *sync.WaitGroup, id int) {
 	var mu sync.Mutex
@@ -40,11 +40,11 @@ loop:
 	}
 }
 
-func InsertwithPoint(urs *Model.User) error {
+func InsertwithPoint(urs *Database.User) error {
 	//1.3/ Viết hàm: sau khi tạo user thì insert user_id vào user_point với số điểm 10.
-	p := Model.Point{
+	p := Database.Point{
 		UserId: urs.Id,
-		Points:  10,
+		Points: 10,
 	}
 	err := p.Insert(&p)
 	if err != nil {
@@ -67,11 +67,11 @@ func BirthtoTimeStamp(d int, m time.Month, y int) int64 {
 
 func ReadFromDb(c chan DataUser, wg *sync.WaitGroup) error {
 
-	rows, err := conn.Rows(&Model.User{})
+	rows, err := conn.Rows(&Database.User{})
 	// SELECT * FROM user
 	defer rows.Close()
 
-	bean := new(Model.User)
+	bean := new(Database.User)
 	i := 0
 	for rows.Next() {
 		i++
@@ -96,8 +96,8 @@ func TransactionBirth(id string, birth int64) error {
 
 	session := conn.NewSession()
 	defer session.Close()
-	p := Model.Point{}
-	us := Model.User{}
+	p := Database.Point{}
+	us := Database.User{}
 	//
 	eff1, err := session.Cols("points").Where("user_id = ?", id).Get(&p)
 	if !eff1 {
@@ -121,7 +121,7 @@ func TransactionBirth(id string, birth int64) error {
 	}
 
 	//
-	eff3, err := session.Where("id = ?", id).Update(&Model.User{Birth: birth, Name: us.Name + " Update"})
+	eff3, err := session.Where("id = ?", id).Update(&Database.User{Birth: birth, Name: us.Name + " Update"})
 	if eff3 == 0 {
 		session.Rollback()
 		return errors.New("Get User with Name field failed")
@@ -134,7 +134,7 @@ func TransactionBirth(id string, birth int64) error {
 
 	//
 
-	eff4, err := session.Cols("points").Where("user_id = ?", id).Update(&Model.Point{Points: p.Points + 10})
+	eff4, err := session.Cols("points").Where("user_id = ?", id).Update(&Database.Point{Points: p.Points + 10})
 	if eff4 == 0 {
 		session.Rollback()
 		return errors.New("Get User with Name field failed")
@@ -212,14 +212,17 @@ func main() {
 	//guid := xid.New()
 	//u := Model.User{}
 	//data,err := u.ShowList()
-	u := Model.User{
-		Id:         "CucCang",
-		Name:       "Giang ",
-		Birth:      BirthtoTimeStamp(7, 2, 1999),
-		Created:    time.Now().UnixNano(),
+	u := Database.User{
+		Id:        "CucCang",
+		Name:      "Giang ",
+		Birth:     BirthtoTimeStamp(7, 2, 1999),
+		Created:   time.Now().UnixNano(),
 		UpdatedAt: time.Now().UnixNano(),
 	}
-	InsertwithPoint(&u)
+	data,err:=u.ShowList()
+	for _,item:=range data{
+		fmt.Println(item)
+	}
 
 	if err != nil {
 		fmt.Println(err)

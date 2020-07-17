@@ -1,4 +1,4 @@
-package Model
+package Database
 
 import (
 	_ "github.com/go-sql-driver/mysql"
