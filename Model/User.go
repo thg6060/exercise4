@@ -109,9 +109,14 @@ nếu 1 quá trình fail thì rollback, xong commit (CreateSesson)
 		return err
 	}
 
-	session.Where("id = ?", id).Update(&User{Birth:birth,Name:u.Name+" Update"})
-	session.Cols("points").Where("user_id = ?",id).Update(&Point{Points: p.Points+10})
-	session.Commit()
+	_,err = session.Where("id = ?", id).Update(&User{Birth:birth,Name:u.Name+" Update"})
+	_,err =session.Cols("points").Where("user_id = ?",id).Update(&Point{Points: p.Points+10})
+	err = session.Commit()
+
+	if err != nil{
+		session.Rollback()
+		return err
+	}
 	return nil
 
 }
